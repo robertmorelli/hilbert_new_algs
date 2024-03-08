@@ -1,0 +1,14 @@
+{
+  "name": "hilbert-fast",
+  "version": "1.0.0",
+  "description": "hilbert curve calculations in handwritten wasm (wat)",
+  "main": "in-js.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wasm-feature-detect": "^1.6.1"
+  }
+}

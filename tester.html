@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hilbert Functions Test</title>
+    <style>
+        svg {
+            border: 1px solid black;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const size = 64;
+
+
+
+
+
+    
+        // (i32.const 0) (i32.const 32) (i32.const 1) (i32.const 0) (i32.const 3) (i32.const 48) (i32.const 2) (i32.const 0)
+        // (i32.const 3) (i32.const 56) (i32.const 0) (i32.const 40) (i32.const 2) (i32.const 8) (i32.const 1) (i32.const 8)
+        // (i32.const 2) (i32.const 16) (i32.const 3) (i32.const 32) (i32.const 1) (i32.const 16) (i32.const 0) (i32.const 48)
+        // (i32.const 1) (i32.const 24) (i32.const 2) (i32.const 24) (i32.const 0) (i32.const 56) (i32.const 3) (i32.const 40)
+        // (i32.const 0) (i32.const 0) (i32.const 3) (i32.const 16) (i32.const 1) (i32.const 32) (i32.const 2) (i32.const 32)
+        // (i32.const 1) (i32.const 40) (i32.const 0) (i32.const 8) (i32.const 2) (i32.const 40) (i32.const 3) (i32.const 24)
+        // (i32.const 2) (i32.const 48) (i32.const 1) (i32.const 48) (i32.const 3) (i32.const 0) (i32.const 0) (i32.const 16)
+        // (i32.const 3) (i32.const 8) (i32.const 2) (i32.const 56) (i32.const 0) (i32.const 24) (i32.const 1) (i32.const 56)
+
+
+        /*
+
+
+> 12341n
+> 0n
+> 3085n
+> 0n
+> 0n 8n 3n 9n 3n 56n
+> 12341n
+> 0n
+> 6170n
+> 2n
+> 2n 8n 14n 59n 2n 56n
+> 12341n
+> 2n
+> 12341n
+> 0n
+> 0n 0n 59n 57n 3n 8n
+> 12341n
+> 0n
+> 0n
+> 0n
+> 0n 0n 239n 9n 3n 56n
+> 12341n
+> 0n
+> 0n
+> 0n
+> 0n 0n 959n 57n 3n 8n
+> 959n
+
+12341
+0
+3085
+0
+0 4 3 5 3 48
+12341
+0
+6170
+2
+2 4 12 55 0 16
+12341
+2
+12341
+0
+0 0 50 17 2 16
+12341
+0
+0
+0
+0 0 202 17 2 16
+12341
+0
+0
+0
+0 0 810 17 2 16
+810
+
+
+
+        */
+
+
+
+
+
+
+        const table = [
+            0b00, 0b100000, 0b01, 0b000000, 0b11, 0b110000, 0b10, 0b000000,
+            0b11, 0b111000, 0b00, 0b101000, 0b10, 0b001000, 0b01, 0b001000,
+            0b10, 0b010000, 0b11, 0b100000, 0b01, 0b010000, 0b00, 0b110000,
+            0b01, 0b011000, 0b10, 0b011000, 0b00, 0b111000, 0b11, 0b101000,
+            0b00, 0b000000, 0b11, 0b010000, 0b01, 0b100000, 0b10, 0b100000,
+            0b01, 0b101000, 0b00, 0b001000, 0b10, 0b101000, 0b11, 0b011000,
+            0b10, 0b110000, 0b01, 0b110000, 0b11, 0b000000, 0b00, 0b010000,
+            0b11, 0b001000, 0b10, 0b111000, 0b00, 0b011000, 0b01, 0b111000,
+        ];
+        function hilbertFull(x, y, state, top, bot) {
+            
+            let yh = 0b00, xh = 0b00, result = 0b00, index = 0b00, offset = 0b00;
+            do {
+                top = top - 0b10;
+                result = result << 0b10;
+                yh = y >> top;
+                console.log(x);
+                top = top - 0b01;
+                yh = yh & 0b10;
+                xh = x >> top;
+                index = state | yh;
+                top = top + 0b10;
+                xh = xh & 0b100;
+                console.log(xh);
+                index = index | xh;
+                offset = table[index];
+                index = index | 0b01;
+                result = result | offset;
+                state = table[index];
+                //(call $log (local.get $yh) (local.get $xh) (local.get $result) (local.get $index) (local.get $offset) (local.get $state))
+                // console.log(yh,xh,result,index,offset,state);
+            } while (top >= bot);
+            return result;
+        }
+        function hilbertClassicInt64(x, y) {
+            return hilbertFull(x, y, 0b00, 4, 0);
+        }
+        console.log(table.map(e => `\\${e<16?'0':''}${(e).toString(16)}`).join(""));
+        // console.log(hilbertClassicInt64(23421, 12341) );
+        throw new Error();
+
+        // Example Hilbert function (replace with actual implementations)
+        function hilbertExample(x, y) {
+            // Your Hilbert function logic here
+            return x + y; // Placeholder logic
+        }
+
+        // List of Hilbert functions
+        const hilbertFunctions = [hilbertClassicInt64,];
+
+        // Function to create and connect points in SVG
+        function createSvg(points) {
+            const svgNS = "http://www.w3.org/2000/svg";
+            let svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "200");
+            svg.setAttribute("height", "200");
+
+            let polygon = document.createElementNS(svgNS, "polygon");
+            polygon.setAttribute("fill", "none");
+            polygon.setAttribute("stroke", "black");
+
+            let pointsAttr = points.map(p => `${p.x * (200 / (size * size))},${p.y * (200 / (size * size))}`).join(" ");
+            polygon.setAttribute("points", pointsAttr);
+
+            svg.appendChild(polygon);
+            document.body.appendChild(svg);
+        }
+
+        // Generate points and apply Hilbert functions
+        hilbertFunctions.forEach(hilbertFunction => {
+            // Create sparse grid points
+            const gridPoints = [];
+            for (let x = 0; x < size; x += size / 64) {
+                for (let y = 0; y < size; y += size / 64) {
+                    gridPoints.push({ x: x * size, y: y * size, order: hilbertFunction(x * size, y * size) });
+                }
+            }
+            gridPoints.sort((a, b) => a.order - b.order);
+            createSvg(gridPoints);
+
+            // Create random points
+            const randomPoints = Array.from({ length: 200 }, () => ({
+                x: Math.random() * size,
+                y: Math.random() * size,
+                order: 0
+            })).map(p => ({ ...p, order: hilbertFunction(p.x, p.y) }));
+            randomPoints.sort((a, b) => a.order - b.order);
+            createSvg(randomPoints);
+        });
+    </script>
+</body>
+
+</html>

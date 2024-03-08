@@ -1,0 +1,25 @@
+
+
+
+
+function sepBy2Only26Bits(n) {
+    a = n & 0x0802080; a = a * a;
+    b = n & 0x00a8820; b = b * b;
+    c = n & 0x0500441; c = c * c;
+    d = n & 0x1015100; d = d * d;
+    e = n & 0x0040014; e = e * e;
+    f = n & 0x220020a; f = f * f;
+    return (a | b | c | d | e | f) & 0x55555555555555;
+}
+
+
+int[] masks = { 0xFFFFFFFF, 0x0000FFFF, 0x00FF00FF, 0x0F0F0F0F, 0x33333333, 0x55555555 };
+
+function sepBy2Only32Bits(n) {
+    n = (n | n << 16) & masks[1];
+    n = (n | n << 8) & masks[2];
+    n = (n | n << 4) & masks[3];
+    n = (n | n << 2) & masks[4];
+    n = (n | n << 1) & masks[5];
+    return n;
+}
