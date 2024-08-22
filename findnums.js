@@ -25,9 +25,10 @@ function shuffleArray(array) {
 
 
 let f;
+let tryNum = 0;
 do{
     f = [];
-    const r = new Set(".".repeat(26).split("").map((_,i)=>BigInt(i + 1)));
+    const r = new Set(".".repeat(17).split("").map((_,i)=>BigInt(i + 1)));
     while([...r.values()].length>0){
         const l = [];
         for(const e of shuffleArray([...r.values()])){
@@ -40,7 +41,9 @@ do{
         }
         f.push(l);
     }
-}while(f.length > 6);
+    tryNum++;
+    console.log(tryNum);
+}while(f.length > 4);
 
 
 
@@ -67,6 +70,19 @@ for(const tttt of sadhkfa){
 
 }
 console.log(`
+
+
+uint32_t inline __attribute__((always_inline)) sepBy2Only26Bits(uint32_t n) {
+    /*register uint32_t
+        a = n & ${sadhkfa.pop().toString(16)},
+        b = n & ${sadhkfa.pop().toString(16)},
+        c = n & ${sadhkfa.pop().toString(16)},
+        d = n & ${sadhkfa.pop().toString(16)},
+    return ( (a * a) | (b * b) | (c * c) | (d * d)  ) & 0x55555555555555;
+}
+`)
+
+/*
 function sep2f26(n){
     let a,b,c,d,e,f;
     a = n & 0x${sadhkfa.pop().toString(16)}n; a = a * a;
@@ -76,9 +92,7 @@ function sep2f26(n){
     e = n & 0x${sadhkfa.pop().toString(16)}n; b = b | (e * e);
     f = n & 0x${sadhkfa.pop().toString(16)}n; c = c | (f * f);
     return (a | b | c) & 0x5555555555555555n;
-}
-`)
-
+}*/
 
 
 

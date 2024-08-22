@@ -27,7 +27,16 @@
 /*
  0x0802080 0x00a8820 0x0500441 0x1015100 0x0040014 0x220020a
 */
-uint32_t sepBy2Only26Bits(uint32_t n) {
+
+uint32_t inline __attribute__((always_inline)) sepBy2Only26Bits(uint32_t n) {
+    register uint32_t
+        a = n & 0x11014,
+        b = n & 0xa808,
+        c = n & 0x4540,
+        d = n & 0x202a2;
+    return ( (a * a) | (b * b) | (c * c) | (d * d)  ) & 0x55555555555555;
+}
+/*uint32_t inline __attribute__((always_inline)) sepBy2Only26Bits(uint32_t n) {
     register uint32_t
         a = n & 0x0802080,
         b = n & 0x00a8820,
@@ -36,10 +45,19 @@ uint32_t sepBy2Only26Bits(uint32_t n) {
         e = n & 0x0040014,
         f = n & 0x220020a;
     return ( (a * a) | (b * b) | (c * c) | (d * d) | (e * e) | (f * f) ) & 0x55555555555555;
-}
+    /*return
+    (
+        ((n & 0x0802080) * (n & 0x0802080)) |
+        ((n & 0x00a8820) * (n & 0x00a8820)) |
+        ((n & 0x0500441) * (n & 0x0500441)) |
+        ((n & 0x1015100) * (n & 0x1015100)) |
+        ((n & 0x0040014) * (n & 0x0040014)) |
+        ((n & 0x220020a) * (n & 0x220020a))
+    ) & 0x55555555555555;
+}*/
 
-uint32_t morton26(uint32_t x, uint32_t y) {
-    y <<= 1;
+uint32_t inline __attribute__((always_inline)) morton26(uint32_t x, uint32_t y) {
+    /*y <<= 1;
     register uint32_t
         a = x & 0x0802080,
         b = x & 0x00a8820,
@@ -56,10 +74,22 @@ uint32_t morton26(uint32_t x, uint32_t y) {
         l = y & 0x20208a0;
     return
         ( ( (a * a) | (b * b) | (c * c) | (d * d) | (e * e) | (f * f) ) & 0x55555555555555 ) |
-        ( ( (g * g) | (h * h) | (i * i) | (j * j) | (k * k) | (l * l) ) & 0xaaaaaaaaaaaaaa );
+        ( ( (g * g) | (h * h) | (i * i) | (j * j) | (k * k) | (l * l) ) & 0xaaaaaaaaaaaaaa );*/
+    return sepBy2Only26Bits(x) | (sepBy2Only26Bits(y) << 1);
 }
 
-uint32_t morton32(uint32_t x, uint32_t y) {
+
+
+uint32_t inline __attribute__((always_inline)) sepBy2Only32Bits(uint32_t n) {
+    n = (n | n << 16) & 0x0000FFFF;
+    n = (n | n << 8) & 0x00FF00FF;
+    n = (n | n << 4) & 0x0F0F0F0F;
+    n = (n | n << 2) & 0x33333333;
+    n = (n | n << 1) & 0x55555555;
+    return n;
+}
+
+uint32_t inline __attribute__((always_inline)) morton32(uint32_t x, uint32_t y) {
     return sepBy2Only32Bits(x) | (sepBy2Only32Bits(y) << 1);
 }
 
@@ -91,14 +121,6 @@ int sepBy2Only26Bitso(int n) {
 
 
 
-uint32_t sepBy2Only32Bits(uint32_t n) {
-    n = (n | n << 16) & 0x0000FFFF;
-    n = (n | n << 8) & 0x00FF00FF;
-    n = (n | n << 4) & 0x0F0F0F0F;
-    n = (n | n << 2) & 0x33333333;
-    n = (n | n << 1) & 0x55555555;
-    return n;
-}
 
 
 
@@ -172,16 +194,29 @@ int main() {
 
         total = 0;
         gettimeofday(&start, NULL);
-        // Test sepBy2Only32Bits
-        for (uint32_t i = 0; i < NUM_TESTS;) {
-            do100(result += sepBy2Only26Bitso(testData[i]);i++;)
-            do100(result += sepBy2Only26Bitso(testData[i]);i++;)
-            do100(result += sepBy2Only26Bitso(testData[i]);i++;)
-            do100(result += sepBy2Only26Bitso(testData[i]);i++;)
+        // Test morton26
+        for (uint32_t i = 1; i < NUM_TESTS;) {
+            do100(result += morton26(testData[i - 1], testData[i]);i++;)
+            do100(result += morton26(testData[i - 1], testData[i]);i++;)
+            do100(result += morton26(testData[i - 1], testData[i]);i++;)
+            do100(result += morton26(testData[i - 1], testData[i]);i++;)
         }
         gettimeofday(&end, NULL);
         total += time_diff(start, end);
-        printf("Total time for sepBy2Only26Bitso: %f microseconds\n", total);
+        printf("Total time for morton26: %f microseconds\n", total);
+
+        total = 0;
+        gettimeofday(&start, NULL);
+        // Test morton32
+        for (uint32_t i = 1; i < NUM_TESTS;) {
+            do100(result += morton32(testData[i - 1], testData[i]);i++;)
+            do100(result += morton32(testData[i - 1], testData[i]);i++;)
+            do100(result += morton32(testData[i - 1], testData[i]);i++;)
+            do100(result += morton32(testData[i - 1], testData[i]);i++;)
+        }
+        gettimeofday(&end, NULL);
+        total += time_diff(start, end);
+        printf("Total time for morton32: %f microseconds\n", total);
 
         printf("=========\n\n");
     }
